@@ -5,25 +5,39 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function login(Request $request): \Illuminate\Http\JsonResponse
+    public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        // Valida as credenciais
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
 
-        if (auth()->attempt($credentials)) {
-            $user = auth()->user();
-            $token = $user->createToken('auth_token')->plainTextToken;
+        // Verifica o usuário
+        if (!Auth::attempt($credentials)) {
             return response()->json([
-               'access_token' => $token,
-               'token_type' => 'Bearer',
-            ]);
-        } else {
-            return response()->json(['error' => 'Unauthorized'], 401);
+                'message' => 'Invalid login credentials.'
+            ], 401);
         }
+
+        // Encontra o usuário autenticado
+        $user = Auth::user();
+
+        // Gera o token usando o método createToken
+        $token = $user->createToken('AppToken')->plainTextToken;
+
+        // Retorna o token diretamente como string, e não como objeto
+        return response()->json([
+            'access_token' => $token,
+            'role' => $user->role, // Supondo que o usuário tenha um campo 'role'
+        ]);
     }
+
 
     public function register(Request $request) {
         $validator = Validator::make ( $request->all(), [], [
@@ -51,11 +65,21 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
+        if ($request->user()) {
+            // Deleta o token atual
             $request->user()->currentAccessToken()->delete();
-
-            return response()->json(['message' => 'Logout realizado com sucesso!'], 200);
-
+            return response()->json([
+                'message' => 'Logout successful'
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Usuário não autenticado ou token inválido'
+            ], 401);
+        }
     }
+
+
 }
 
