@@ -1,31 +1,36 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
+use Google\Client;
 use Google\Service\Calendar\Event;
 use Google\Service\Calendar\EventDateTime;
 use Google\Service\Calendar;
-use Google\Client; // Certifique-se de importar o Client
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CalendarController extends Controller
 {
-    protected $calendar;
     protected $client;
+    protected $calendar;
 
-    public function __construct(Calendar $calendar)
+    public function __construct()
     {
-        $this->calendar = $calendar;
-
         $this->client = new Client();
-        $this->client->setApplicationName('Sua Aplicação');
-        $this->client->setScopes(Calendar::CALENDAR_READONLY);
-        $token = $this->getAccessToken();
-        $this->client->setAccessToken($token);
+        $this->client->setAuthConfig(storage_path('app/credentials.json'));
+        $this->client->setAccessType('offline');
+        $this->client->setIncludeGrantedScopes(true);
+        $this->client->addScope(Calendar::CALENDAR);
     }
 
+    // Criar evento
     public function createEvent()
     {
+        if (!$this->initializeCalendarService()) {
+            return response()->json(['error' => 'Google Calendar service is not initialized.'], 500);
+        }
+
         $event = new Event([
             'summary' => 'Corte de Cabelo',
             'start' => new EventDateTime([
@@ -38,13 +43,21 @@ class CalendarController extends Controller
             ]),
         ]);
 
-        $this->calendar->events->insert('primary', $event);
-
-        return redirect()->back()->with('message', 'Evento criado com sucesso!');
+        try {
+            $this->calendar->events->insert('primary', $event);
+            return response()->json(['message' => 'Evento criado com sucesso!'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao criar evento: ' . $e->getMessage()], 500);
+        }
     }
 
+    // Listar eventos
     public function listEvents()
     {
+        if (!$this->initializeCalendarService()) {
+            return response()->json(['error' => 'Google Calendar service is not initialized.'], 500);
+        }
+
         $optParams = [
             'maxResults' => 10,
             'orderBy' => 'startTime',
@@ -52,19 +65,62 @@ class CalendarController extends Controller
             'timeMin' => date('c'),
         ];
 
-        // Tenta listar os eventos
         try {
             $events = $this->calendar->events->listEvents('primary', $optParams);
+            if (!$events || !method_exists($events, 'getItems')) {
+                return response()->json(['error' => 'No events found or unable to retrieve items from the Google Calendar API.'], 404);
+            }
             return response()->json($events->getItems(), 200);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Erro ao listar eventos: ' . $e->getMessage()], 500);
         }
     }
 
+    // Inicializa o serviço do Google Calendar, verificando se o token está válido
+    private function initializeCalendarService()
+    {
+        $token = $this->getAccessToken();
+
+        if ($token) {
+            $this->client->setAccessToken($token);
+
+            // Verifica se o token de acesso está expirado
+            if ($this->client->isAccessTokenExpired()) {
+                Log::info('Access token expired, fetching new token.');
+                $refreshToken = $this->client->getRefreshToken();
+
+                if ($refreshToken) {
+                    $newToken = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
+                    $this->saveAccessToken($newToken); // Salva o novo token de acesso e refresh
+                } else {
+                    Log::error('Refresh token not available.');
+                    return false;
+                }
+            }
+
+            $this->calendar = new Calendar($this->client);
+            return true;
+        } else {
+            Log::error('Access token is invalid or not available.');
+            return false;
+        }
+    }
+
+    // Recupera o token de acesso do usuário autenticado
     private function getAccessToken()
     {
-        // Implemente a lógica para recuperar o token de acesso
-        // Isso pode ser uma busca no banco de dados ou em um serviço de cache
-        return 'SEU_TOKEN_DE_ACESSO'; // Substitua por sua lógica de recuperação do token
+        $user = auth()->user();
+        return $user ? json_decode($user->google_access_token, true) : null;
+    }
+
+    // Salva o novo token
+    private function saveAccessToken($token)
+    {
+        $user = auth()->user();
+        if ($user) {
+            $user->google_access_token = json_encode($token);
+            $user->save();
+        }
     }
 }
+
