@@ -24,7 +24,6 @@ class CalendarController extends Controller
         $this->client->addScope(Calendar::CALENDAR);
     }
 
-    // Criar evento
     public function createEvent()
     {
         if (!$this->initializeCalendarService()) {
@@ -51,7 +50,6 @@ class CalendarController extends Controller
         }
     }
 
-    // Listar eventos
     public function listEvents()
     {
         if (!$this->initializeCalendarService()) {
@@ -76,7 +74,6 @@ class CalendarController extends Controller
         }
     }
 
-    // Inicializa o serviço do Google Calendar, verificando se o token está válido
     private function initializeCalendarService()
     {
         $token = $this->getAccessToken();
@@ -84,16 +81,14 @@ class CalendarController extends Controller
         if ($token) {
             $this->client->setAccessToken($token);
 
-            // Verifica se o token de acesso está expirado
             if ($this->client->isAccessTokenExpired()) {
                 Log::info('Access token expired, fetching new token.');
                 $refreshToken = $this->client->getRefreshToken();
 
                 if ($refreshToken) {
                     $newToken = $this->client->fetchAccessTokenWithRefreshToken($refreshToken);
-                    $this->saveAccessToken($newToken); // Salva o novo token de acesso e refresh
+                    $this->saveAccessToken($newToken);
                 } else {
-                    Log::error('Refresh token not available.');
                     return false;
                 }
             }
@@ -106,7 +101,6 @@ class CalendarController extends Controller
         }
     }
 
-    // Recupera o token de acesso do usuário autenticado
     private function getAccessToken()
     {
         $user = auth()->user();

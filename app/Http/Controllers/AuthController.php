@@ -12,29 +12,24 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // Valida as credenciais
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        // Verifica o usuário
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'message' => 'Invalid login credentials.'
             ], 401);
         }
 
-        // Encontra o usuário autenticado
         $user = Auth::user();
 
-        // Gera o token usando o método createToken
         $token = $user->createToken('AppToken')->plainTextToken;
 
-        // Retorna o token diretamente como string, e não como objeto
         return response()->json([
             'access_token' => $token,
-            'role' => $user->role, // Supondo que o usuário tenha um campo 'role'
+            'role' => $user->role,
         ]);
     }
 
@@ -68,7 +63,6 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         if ($request->user()) {
-            // Deleta o token atual
             $request->user()->currentAccessToken()->delete();
             return response()->json([
                 'message' => 'Logout successful'
