@@ -94,7 +94,7 @@ class GoogleController extends Controller
 
             Auth::login($user);
 
-            return response()->json(['message' => 'Autenticado com sucesso', 'token' => $googleUser->token]);
+            return redirect('http://localhost:8080/dashboard');
         } catch (\Exception $e) {
             return response()->json(['error' => 'Falha ao autenticar com Google: ' . $e->getMessage()], 500);
         }
