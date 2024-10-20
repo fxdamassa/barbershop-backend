@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 class RouteServiceProvider extends ServiceProvider
 {
     /**
-     * This namespace is applied to your controller routes.
+     * This namespace is applied to your controller router.
      *
      * @var string|null
      */
@@ -25,7 +25,7 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Define the routes for the application.
+     * Define the router for the application.
      *
      * @return void
      */
@@ -37,9 +37,9 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Define the "web" routes for the application.
+     * Define the "web" router for the application.
      *
-     * These routes all receive session state, CSRF protection, etc.
+     * These router all receive session state, CSRF protection, etc.
      *
      * @return void
      */
@@ -47,13 +47,13 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(base_path('routes/web.php'));
+            ->group(base_path('router/web.php'));
     }
 
     /**
-     * Define the "api" routes for the application.
+     * Define the "api" router for the application.
      *
-     * These routes are typically stateless.
+     * These router are typically stateless.
      *
      * @return void
      */
@@ -62,6 +62,6 @@ class RouteServiceProvider extends ServiceProvider
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->namespace)
-            ->group(base_path('routes/api.php'));
+            ->group(base_path('router/api.php'));
     }
 }
