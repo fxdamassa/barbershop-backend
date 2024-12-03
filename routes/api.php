@@ -10,7 +10,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/register', [AuthController::class, 'register']);
 
-Route::middleware('auth:sanctum')->get('google/calendar/list', [GoogleController::class, 'listGoogleCalendarEvents'])->name('google.calendar.list');
+Route::get('google/redirect', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
 // Calendar Routes
 Route::post('calendar/create', [CalendarController::class, 'createEvent'])->name('calendar.create');
 Route::middleware('auth:sanctum')->get('calendar/list', [CalendarController::class, 'listEvents'])->name('calendar.list');
