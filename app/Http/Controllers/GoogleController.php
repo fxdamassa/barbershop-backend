@@ -16,7 +16,6 @@ class GoogleController extends Controller
     {
         return Socialite::driver('google')
             ->scopes([
-                'https://www.googleapis.com/auth/calendar',
                 'https://www.googleapis.com/auth/userinfo.email',
                 'https://www.googleapis.com/auth/userinfo.profile',
             ])
@@ -61,42 +60,6 @@ class GoogleController extends Controller
             return redirect('http://localhost:8080/dashboard');
         } catch (\Exception $e) {
             return response()->json(['error' => 'Falha ao autenticar com Google: ' . $e->getMessage()], 500);
-        }
-    }
-
-    // Listar eventos do calendário Google
-    public function listGoogleCalendarEvents(Request $request)
-    {
-        try {
-            $user = auth()->user();
-            if (!$user) {
-                return response()->json(['error' => 'Usuário não autenticado.'], 401);
-            }
-
-            $client = new Google_Client();
-            // **Carrega as credenciais do arquivo JSON**
-            $client->setAuthConfig(storage_path('app/credentials.json'));
-            $client->addScope(Google_Service_Calendar::CALENDAR);
-
-            $accessToken = json_decode($user->google_access_token, true);
-            $client->setAccessToken($accessToken);
-
-            if ($client->isAccessTokenExpired()) {
-                if (isset($accessToken['refresh_token'])) {
-                    $newToken = $client->fetchAccessTokenWithRefreshToken($accessToken['refresh_token']);
-                    $user->google_access_token = json_encode($newToken);
-                    $user->save();
-                } else {
-                    return response()->json(['error' => 'Token de acesso expirado e sem refresh token disponível.'], 401);
-                }
-            }
-
-            $calendarService = new Google_Service_Calendar($client);
-            $events = $calendarService->events->listEvents('primary');
-
-            return response()->json($events->getItems());
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Erro ao listar eventos: ' . $e->getMessage()], 500);
         }
     }
 }
