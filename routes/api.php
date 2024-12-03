@@ -10,10 +10,6 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/register', [AuthController::class, 'register']);
 
-// Google Calendar Rotas
-Route::get('google/redirect', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
-Route::get('google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
-
 Route::middleware('auth:sanctum')->get('google/calendar/list', [GoogleController::class, 'listGoogleCalendarEvents'])->name('google.calendar.list');
 // Calendar Routes
 Route::post('calendar/create', [CalendarController::class, 'createEvent'])->name('calendar.create');
@@ -23,7 +19,5 @@ Route::middleware('auth:sanctum')->get('calendar/list', [CalendarController::cla
 Route::middleware('auth:sanctum')->get('test-auth', function () {
     return auth()->user();
 });
-
-
 Route::middleware('auth:sanctum')->get('/calendar/admin/list', [CalendarController::class, 'listEvents'])->name('calendar.admin.list');
 Route::middleware('auth:sanctum')->post('/calendar/admin/create', [CalendarController::class, 'createEvent'])->name('calendar.admin.create');
