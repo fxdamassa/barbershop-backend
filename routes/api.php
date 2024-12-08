@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoogleAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -20,5 +21,6 @@ Route::middleware('auth:sanctum')->get('calendar/list', [CalendarController::cla
 Route::middleware('auth:sanctum')->get('test-auth', function () {
     return auth()->user();
 });
-Route::middleware('auth:sanctum')->get('/calendar/admin/list', [CalendarController::class, 'listEvents'])->name('calendar.admin.list');
-Route::middleware('auth:sanctum')->post('/calendar/admin/create', [CalendarController::class, 'createEvent'])->name('calendar.admin.create');
+
+// Middlewares
+Route::middleware('auth:sanctum')->get('/user/name', [GoogleController::class, 'getUsername']);
