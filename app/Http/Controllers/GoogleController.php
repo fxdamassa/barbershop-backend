@@ -15,7 +15,6 @@ class GoogleController extends Controller
     {
         return Socialite::driver('google')
             ->scopes(['openid', 'email', 'profile'])
-            ->with(['prompt' => 'select_account'])
             ->stateless()
             ->redirect();
     }
@@ -33,21 +32,28 @@ class GoogleController extends Controller
                 ['email' => $googleUser->email],
                 [
                     'name' => $googleUser->name,
-                    'google_access_token' => json_encode([
-                        'access_token' => $googleUser->token,
-                        'refresh_token' => $googleUser->refreshToken,
-                        'expires_in' => $googleUser->expiresIn,
-                    ]),
                     'password' => bcrypt('google-login'),
                 ]
             );
 
             Auth::login($user);
 
-            return redirect('http://localhost:8080/dashboard');
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return redirect()->away('http://localhost:8080/dashboard?token=' . $token . '&user=' . urlencode($user->name));
         } catch (\Exception $e) {
             return response()->json(['error' => 'Falha ao autenticar com Google: ' . $e->getMessage()], 500);
         }
     }
 
+    public function getUsername(Request $request): \Illuminate\Http\JsonResponse
+    {
+        if (!Auth::check()) {
+            \Log::info('Usuário não autenticado.');
+            return response()->json(['error' => 'Usuário não identificado'], 401);
+        }
+
+        $user = $request->user();
+        \Log::info('Nome do usuário autenticado:', ['name' => $user->name]);
+        return response()->json(['user' => $user->name], 200);
+    }
 }
