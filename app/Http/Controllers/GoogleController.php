@@ -11,7 +11,6 @@ use Google_Service_Calendar;
 
 class GoogleController extends Controller
 {
-    // Redirecionar para Google OAuth
     public function redirectToGoogle()
     {
         return Socialite::driver('google')
@@ -26,21 +25,29 @@ class GoogleController extends Controller
         try {
             $googleUser = Socialite::driver('google')->stateless()->user();
 
-            if(!$googleUser || !$googleUser->email){
+            if (!$googleUser || !$googleUser->email) {
                 return response()->json(['error' => 'Erro ao autenticar com o Google.'], 401);
             }
 
-            $user = User::firstOrCreate(
+            $user = User::updateOrCreate(
                 ['email' => $googleUser->email],
                 [
                     'name' => $googleUser->name,
-                    'password' => bcrypt('google-login'), // Senha fictícia (não será usada)
+                    'google_access_token' => json_encode([
+                        'access_token' => $googleUser->token,
+                        'refresh_token' => $googleUser->refreshToken,
+                        'expires_in' => $googleUser->expiresIn,
+                    ]),
+                    'password' => bcrypt('google-login'),
                 ]
             );
+
             Auth::login($user);
+
             return redirect('http://localhost:8080/dashboard');
         } catch (\Exception $e) {
             return response()->json(['error' => 'Falha ao autenticar com Google: ' . $e->getMessage()], 500);
         }
     }
+
 }
