@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AgendarCorte;
 use Illuminate\Http\Request;
 use Google_Client;
 use Google_Service_Calendar;
@@ -9,44 +10,37 @@ use Google_Service_Calendar_Event;
 
 class CalendarController extends Controller
 {
-    public function createEvent(Request $request)
+    public function salvarAgendamento(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
 
         if (!$user) {
+            \Log::error('Usuário não autenticado ao tentar salvar o agendamento.');
             return response()->json(['error' => 'Usuário não autenticado'], 401);
         }
 
+        \Log::info('Dados recebidos para agendamento:', $request->all());
+
+        $validatedData = $request->validate([
+            'data_agendamento' => 'required|date|after_or_equal:today',
+            'hora_agendamento' => 'required|date_format:H:i',
+            'observacao' => 'nullable|string|max:255',
+        ]);
+
         try {
-            $accessToken = json_decode($user->google_access_token, true);
-            $client = new Google_Client();
-            $client->setAccessToken($accessToken);
+            $agendamento = new AgendarCorte();
+            $agendamento->usuario_id = $user->id;
+            $agendamento->data_agendamento = $validatedData['data_agendamento'];
+            $agendamento->hora_agendamento = $validatedData['hora_agendamento'];
+            $agendamento->save();
 
-            if ($client->isAccessTokenExpired()) {
-                $client->fetchAccessTokenWithRefreshToken($accessToken['refresh_token']);
-                $user->google_access_token = json_encode($client->getAccessToken());
-                $user->save();
-            }
+            \Log::info('Agendamento criado com sucesso.', ['agendamento' => $agendamento]);
 
-            $calendarService = new Google_Service_Calendar($client);
-
-            $event = new Google_Service_Calendar_Event([
-                'summary' => $request->input('summary'),
-                'start' => [
-                    'dateTime' => $request->input('start.dateTime'),
-                    'timeZone' => $request->input('start.timeZone'),
-                ],
-                'end' => [
-                    'dateTime' => $request->input('end.dateTime'),
-                    'timeZone' => $request->input('end.timeZone'),
-                ],
-            ]);
-
-            $calendarService->events->insert('primary', $event);
-
-            return response()->json(['message' => 'Evento criado com sucesso!'], 200);
+            return response()->json(['success' => true, 'message' => 'Agendamento salvo com sucesso!'], 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Erro ao criar evento: ' . $e->getMessage()], 500);
+            \Log::error('Erro ao salvar agendamento:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => 'Erro ao salvar agendamento: ' . $e->getMessage()], 500);
         }
     }
+
 }
