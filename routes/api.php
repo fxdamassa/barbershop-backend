@@ -24,3 +24,6 @@ Route::middleware('auth:sanctum')->get('test-auth', function () {
 
 // Middlewares
 Route::middleware('auth:sanctum')->get('/user/name', [GoogleController::class, 'getUsername']);
+
+//Agendar corte
+Route::middleware('auth:sanctum')->post('/agendar-corte', [CalendarController::class, 'salvarAgendamento']);
