@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\AgendaCortesController;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -26,4 +27,9 @@ Route::middleware('auth:sanctum')->get('test-auth', function () {
 Route::middleware('auth:sanctum')->get('/user/name', [GoogleController::class, 'getUsername']);
 
 //Agendar corte
-Route::middleware('auth:sanctum')->post('/agendar-corte', [CalendarController::class, 'salvarAgendamento']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('agendar-corte/{data}', [AgendaCortesController::class, 'getBookedTimes']);
+    Route::post('agendar-corte', [AgendaCortesController::class, 'salvarAgendamento']);
+});
+
+

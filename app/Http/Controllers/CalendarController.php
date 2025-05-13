@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AgendarCorte;
 use Illuminate\Http\Request;
-use Google_Client;
-use Google_Service_Calendar;
-use Google_Service_Calendar_Event;
 
 class CalendarController extends Controller
 {
@@ -41,6 +38,12 @@ class CalendarController extends Controller
             \Log::error('Erro ao salvar agendamento:', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'Erro ao salvar agendamento: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function getBookedTimes($data)
+    {
+        $bookedTimes = AgendarCorte::where('data_agendamento', $data)->pluck('hora_agendamento');
+        return response()->json(['bookedTimes' => $bookedTimes] );
     }
 
 }
