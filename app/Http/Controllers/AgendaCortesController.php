@@ -35,7 +35,7 @@ class AgendaCortesController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Agendamento salvo com sucesso!',
+                'message' => 'Agendamento salvo com sucesso! Email de agendamento enviado para sua caixa de entrada',
                 'agendamento' => $agendamento
             ], 201);
 

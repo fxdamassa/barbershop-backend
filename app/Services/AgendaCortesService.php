@@ -60,7 +60,7 @@ class AgendaCortesService
         $agendamento =  $this->agendaCortesRepository->saveAgendamento($dados);
 
         $this->emailService->enviarConfirmacaoAgendamento(
-            $user->nome,
+            $user->name,
             $user->email,
             $dados['data_agendamento'],
             $dados['hora_agendamento']
