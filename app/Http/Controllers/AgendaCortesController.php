@@ -21,10 +21,7 @@ class AgendaCortesController extends Controller
      */
     public function getBookedTimes($data): JsonResponse
     {
-        $bookedTimes = AgendarCorte::where('data_agendamento', $data)
-            ->pluck('hora_agendamento')
-            ->toArray();
-
+       $bookedTimes = $this->agendaCortesService->getBookedTimes($data);
         return response()->json(['bookedTimes' => $bookedTimes]);
     }
 

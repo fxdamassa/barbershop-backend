@@ -12,7 +12,11 @@ class AgendaCortesRepository
      */
     public function getBookedTimes(string $data): Collection
     {
-        return AgendarCorte::where('data_agendamento', $data)->pluck('hora_agendamento');
+        return AgendarCorte::where('data_agendamento', $data)
+            ->pluck('hora_agendamento')
+            ->map(function ($hora) {
+                return substr($hora, 0, 5);
+            });
     }
 
     /**
