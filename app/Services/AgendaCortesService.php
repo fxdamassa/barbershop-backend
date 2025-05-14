@@ -5,14 +5,17 @@ namespace App\Services;
 use App\Repositories\AgendaCortesRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use App\Services\EmailService;
 
 class AgendaCortesService
 {
     protected AgendaCortesRepository $agendaCortesRepository;
+    protected EmailService $emailService;
 
-    public function __construct(AgendaCortesRepository $agendaCortesRepository)
+    public function __construct(AgendaCortesRepository $agendaCortesRepository, EmailService $emailService)
     {
         $this->agendaCortesRepository = $agendaCortesRepository;
+        $this->emailService = $emailService;
     }
 
     /**
@@ -54,6 +57,15 @@ class AgendaCortesService
             ]);
         }
 
-        return $this->agendaCortesRepository->saveAgendamento($dados);
+        $agendamento =  $this->agendaCortesRepository->saveAgendamento($dados);
+
+        $this->emailService->enviarConfirmacaoAgendamento(
+            $user->nome,
+            $user->email,
+            $dados['data_agendamento'],
+            $dados['hora_agendamento']
+        );
+
+        return $agendamento;
     }
 }
