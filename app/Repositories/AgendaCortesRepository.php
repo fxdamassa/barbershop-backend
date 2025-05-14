@@ -22,4 +22,11 @@ class AgendaCortesRepository
     {
         return AgendarCorte::create($dados);
     }
+
+    public function existeAgendamento($data, $hora) : bool
+    {
+        return AgendarCorte::where('data_agendamento', $data)
+            ->where('hora_agendamento', $hora)
+            ->exists();
+    }
 }

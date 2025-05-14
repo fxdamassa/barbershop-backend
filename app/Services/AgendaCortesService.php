@@ -38,10 +38,21 @@ class AgendaCortesService
         validator($dados, [
             'data_agendamento' => 'required|date|after_or_equal:today',
             'hora_agendamento' => 'required|date_format:H:i',
-            'observacao' => 'nullable|string|max:255',
         ])->validate();
 
         $dados['usuario_id'] = $user->id;
+
+        $agendamentoExistente = $this->agendaCortesRepository->existeAgendamento(
+            $dados['data_agendamento'],
+            $dados['hora_agendamento']
+        );
+
+        if($agendamentoExistente)
+        {
+            throw ValidationException::withMessages([
+                'horario' => 'Já existe agendamento para esse horário',
+            ]);
+        }
 
         return $this->agendaCortesRepository->saveAgendamento($dados);
     }

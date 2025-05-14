@@ -23,7 +23,7 @@ class AgendaCortesController extends Controller
     {
         $bookedTimes = AgendarCorte::where('data_agendamento', $data)
             ->pluck('hora_agendamento')
-            ->toArray(); // Retorna apenas os horários ocupados como array
+            ->toArray();
 
         return response()->json(['bookedTimes' => $bookedTimes]);
     }
@@ -35,15 +35,19 @@ class AgendaCortesController extends Controller
     {
         try {
             $agendamento = $this->agendaCortesService->salvarAgendamento($request->all());
+
             return response()->json([
                 'success' => true,
                 'message' => 'Agendamento salvo com sucesso!',
                 'agendamento' => $agendamento
             ], 201);
+
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Erro ao salvar agendamento: ' . $e->getMessage()
-            ], 500);
+                'error' => $e->getMessage()
+            ], 400);
         }
     }
+
+
 }

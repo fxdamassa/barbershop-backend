@@ -13,7 +13,6 @@ class AgendarCorte extends Model
         'usuario_id',
         'data_agendamento',
         'hora_agendamento',
-        'observacao',
     ];
 
     public function usuario(){
