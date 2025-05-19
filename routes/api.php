@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\AgendaCortesController;
+use App\Http\Controllers\DashboardController;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -31,5 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('agendar-corte/{data}', [AgendaCortesController::class, 'getBookedTimes']);
     Route::post('agendar-corte', [AgendaCortesController::class, 'salvarAgendamento']);
 });
+
+Route::middleware('auth:sanctum')->get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas']);
+Route::middleware('auth:sanctum')->get('/dashboard/estatisticas/{ano?}', [DashboardController::class, 'estatisticas']);
+
+
 
 
