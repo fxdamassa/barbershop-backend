@@ -17,7 +17,14 @@ class DashboardController extends Controller
 
     public function estatisticas(Request $request)
     {
-        $ano = $request->query('ano', now()->year);
-        return response()->json($this->dashboardService->getEstatisticas($ano));
+        $ano = $request->query('ano', date('Y'));
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+
+        $userId = auth()->id();
+
+        return response()->json(
+            $this->dashboardService->getEstatisticas($userId, $ano, $perPage, $page)
+        );
     }
 }

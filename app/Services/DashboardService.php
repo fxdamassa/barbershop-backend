@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\DashboardRepository;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardService
 {
@@ -23,12 +24,28 @@ class DashboardService
         return $this->repository->getAgendamentosDetalhados($usuarioId);
     }
 
-    public function getEstatisticas(int $ano): array
+    public function getEstatisticas(int $userId, int $ano, int $perPage, int $page)
     {
+        $agendamentos = $this->repository->getAgendamentosDetalhadosPorAno($userId, $ano, $perPage, $page);
+
         return [
             'agendamentosPorMes' => $this->repository->getAgendamentosPorMes($ano),
-            'agendamentosDetalhados' => $this->repository->getAgendamentosDetalhados($ano),
+            'agendamentosDetalhados' => $agendamentos->items(),
+            'pagination' => [
+                'current_page' => $agendamentos->currentPage(),
+                'last_page' => $agendamentos->lastPage(),
+                'per_page' => $agendamentos->perPage(),
+                'total' => $agendamentos->total(),
+            ],
         ];
+    }
+
+
+    public function getEstatisticasPaginadas(int $ano, int $perPage = 10)
+    {
+        $userId = Auth::id();
+
+        return $this->repository->getAgendamentosDetalhadosPorAno($userId, $ano, $perPage);
     }
 
 }

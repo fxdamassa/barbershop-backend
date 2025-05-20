@@ -23,5 +23,13 @@ class DashboardRepository
             ->orderBy('data_agendamento', 'desc')
             ->get(['data_agendamento', 'hora_agendamento']);
     }
+
+    public function getAgendamentosDetalhadosPorAno(int $userId, int $ano, int $perPage = 10)
+    {
+        return AgendarCorte::where('usuario_id', $userId)
+            ->whereYear('data_agendamento', $ano)
+            ->orderBy('data_agendamento', 'desc')
+            ->paginate($perPage);
+    }
 }
 
