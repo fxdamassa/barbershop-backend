@@ -41,6 +41,7 @@ class AgendaCortesService
         validator($dados, [
             'data_agendamento' => 'required|date|after_or_equal:today',
             'hora_agendamento' => 'required|date_format:H:i',
+            'servico_id' => 'required|exists:servicos,id',
         ])->validate();
 
         $dados['usuario_id'] = $user->id;
@@ -59,13 +60,23 @@ class AgendaCortesService
 
         $agendamento =  $this->agendaCortesRepository->saveAgendamento($dados);
 
+        $servico = \App\Models\Servico::find($dados['servico_id']);
+        $nomeServico = $servico ? $servico->servico : 'Serviço não identificado';
+
         $this->emailService->enviarConfirmacaoAgendamento(
             $user->name,
             $user->email,
             $dados['data_agendamento'],
-            $dados['hora_agendamento']
+            $dados['hora_agendamento'],
+            $nomeServico,
         );
 
         return $agendamento;
     }
+
+    public function listarServicos()
+    {
+        return $this->agendaCortesRepository->listarServicos();
+    }
+
 }

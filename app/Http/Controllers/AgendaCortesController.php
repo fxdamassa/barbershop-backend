@@ -45,6 +45,11 @@ class AgendaCortesController extends Controller
             ], 400);
         }
     }
+    public function listarServicos(): JsonResponse
+    {
+        $servicos = $this->agendaCortesService->listarServicos();
+        return response()->json(['servicos' => $servicos]);
+    }
 
 
 }

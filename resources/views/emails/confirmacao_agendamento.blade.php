@@ -9,6 +9,8 @@
 
 <p>Seu corte foi agendado com sucesso para o dia <strong>{{ $data }}</strong> às <strong>{{ $hora }}</strong>.</p>
 
+<p><strong>Serviço:</strong> {{ $servico }}</p>
+
 <p>Nos vemos em breve! 💈</p>
 
 <p>Atenciosamente,<br>Equipe BarberApp</p>

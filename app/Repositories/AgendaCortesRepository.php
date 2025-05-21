@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\AgendarCorte;
+use App\Models\Servico;
 use Illuminate\Support\Collection;
 
 class AgendaCortesRepository
@@ -27,10 +28,15 @@ class AgendaCortesRepository
         return AgendarCorte::create($dados);
     }
 
-    public function existeAgendamento($data, $hora) : bool
+    public function existeAgendamento($data, $hora): bool
     {
         return AgendarCorte::where('data_agendamento', $data)
             ->where('hora_agendamento', $hora)
             ->exists();
+    }
+
+    public function listarServicos()
+    {
+        return \App\Models\Servico::all(['id', 'servico']);
     }
 }
