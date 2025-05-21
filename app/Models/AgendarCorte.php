@@ -18,4 +18,9 @@ class AgendarCorte extends Model
     public function usuario(){
         return $this->belongsTo(User::class);
     }
+
+    public function servico()
+    {
+        return $this->belongsTo(Servico::class);
+    }
 }

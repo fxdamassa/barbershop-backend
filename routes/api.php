@@ -8,6 +8,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\AgendaCortesController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ServicoController;
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -36,6 +37,6 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas']);
 Route::middleware('auth:sanctum')->get('/dashboard/estatisticas/{ano?}', [DashboardController::class, 'estatisticas']);
 
-
+//Serviços
 
 
