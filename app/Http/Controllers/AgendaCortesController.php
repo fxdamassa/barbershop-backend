@@ -51,5 +51,14 @@ class AgendaCortesController extends Controller
         return response()->json(['servicos' => $servicos]);
     }
 
+    public function excluirAgendamento(int $id): JsonResponse
+    {
+        try {
+            $this->agendaCortesService->excluirAgendamento($id);
+            return response()->json(['message' => 'Agendamento excluído com sucesso.']);
+        }catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao excluir o agendamento.'], 400);
+        }
+    }
 
 }

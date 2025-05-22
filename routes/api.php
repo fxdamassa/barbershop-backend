@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('agendar-corte/servicos', [AgendaCortesController::class, 'listarServicos']);
     Route::get('agendar-corte/{data}', [AgendaCortesController::class, 'getBookedTimes']);
     Route::post('agendar-corte', [AgendaCortesController::class, 'salvarAgendamento']);
+    Route::delete('agendar-corte/{id}', [AgendaCortesController::class, 'excluirAgendamento']);
 });
 
 Route::middleware('auth:sanctum')->get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas']);

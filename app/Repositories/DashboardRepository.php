@@ -23,6 +23,7 @@ class DashboardRepository
             ->whereYear('data_agendamento', $ano)
             ->where('usuario_id', auth()->id())
             ->orderByDesc('data_agendamento')
+            ->orderByDesc('hora_agendamento')
             ->get()
             ->map(function ($agendamento) {
                 return [
@@ -37,7 +38,8 @@ class DashboardRepository
     {
         return AgendarCorte::where('usuario_id', $userId)
             ->whereYear('data_agendamento', $ano)
-            ->orderBy('data_agendamento', 'desc')
+            ->orderBy('data_agendamento')
+            ->orderBy('hora_agendamento')
             ->paginate($perPage);
     }
 }

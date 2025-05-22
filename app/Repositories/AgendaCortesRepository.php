@@ -39,4 +39,14 @@ class AgendaCortesRepository
     {
         return \App\Models\Servico::all(['id', 'servico']);
     }
+
+    public function buscarPorId(int $id)
+    {
+        return AgendarCorte::find($id);
+    }
+
+    public function excluir($agendamento)
+    {
+        $agendamento->delete();
+    }
 }

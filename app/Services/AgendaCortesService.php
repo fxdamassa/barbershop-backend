@@ -79,4 +79,16 @@ class AgendaCortesService
         return $this->agendaCortesRepository->listarServicos();
     }
 
+    public function excluirAgendamento(int $id)
+    {
+        $userId = auth()->id();
+        $agendamento = $this->agendaCortesRepository->buscarPorId($id);
+
+        if(!$agendamento || $agendamento->usuario_id != $userId){
+            throw new \Exception('Agendamento não encontrado');
+        }
+
+        $this->agendaCortesRepository->excluir($agendamento);
+    }
+
 }
