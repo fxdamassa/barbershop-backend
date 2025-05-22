@@ -17,11 +17,20 @@ class DashboardRepository
             ->get();
     }
 
-    public function getAgendamentosDetalhados(int $ano): Collection
+    public function getAgendamentosDetalhados($ano)
     {
-        return AgendarCorte::whereYear('data_agendamento', $ano)
-            ->orderBy('data_agendamento', 'desc')
-            ->get(['data_agendamento', 'hora_agendamento']);
+        return AgendarCorte::with('servico')
+            ->whereYear('data_agendamento', $ano)
+            ->where('usuario_id', auth()->id())
+            ->orderByDesc('data_agendamento')
+            ->get()
+            ->map(function ($agendamento) {
+                return [
+                    'data_agendamento' => $agendamento->data_agendamento,
+                    'hora_agendamento' => $agendamento->hora_agendamento,
+                    'servico' => $agendamento->servico->servico ?? 'Não informado',
+                ];
+            });
     }
 
     public function getAgendamentosDetalhadosPorAno(int $userId, int $ano, int $perPage = 10)
