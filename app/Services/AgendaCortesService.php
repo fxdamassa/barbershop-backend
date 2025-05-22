@@ -81,14 +81,28 @@ class AgendaCortesService
 
     public function excluirAgendamento(int $id)
     {
-        $userId = auth()->id();
         $agendamento = $this->agendaCortesRepository->buscarPorId($id);
 
-        if(!$agendamento || $agendamento->usuario_id != $userId){
-            throw new \Exception('Agendamento não encontrado');
+        if (!$agendamento) {
+            throw new \Exception('Agendamento não encontrado.');
         }
+
+        $user = Auth::user();
+
+        if ($agendamento->usuario_id !== $user->id) {
+            throw new \Exception('Ação não permitida.');
+        }
+
+        $this->emailService->enviarCancelamentoAgendamento(
+            $user->name,
+            $user->email,
+            $agendamento->data_agendamento,
+            $agendamento->hora_agendamento,
+            $agendamento->servico->servico ?? 'Não informado'
+        );
 
         $this->agendaCortesRepository->excluir($agendamento);
     }
+
 
 }
