@@ -17,11 +17,11 @@ class AgendarCorte extends Model
     ];
 
     public function usuario(){
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 
     public function servico()
     {
-        return $this->belongsTo(Servico::class);
+        return $this->belongsTo(Servico::class, 'servico_id');
     }
 }

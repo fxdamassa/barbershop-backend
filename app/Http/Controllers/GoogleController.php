@@ -6,8 +6,6 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Google_Client;
-use Google_Service_Calendar;
 
 class GoogleController extends Controller
 {
@@ -33,15 +31,23 @@ class GoogleController extends Controller
                 [
                     'name' => $googleUser->name,
                     'password' => bcrypt('google-login'),
+                    'role' => $googleUser->email === 'andreflik@gmail.com' ? 'adm' : 'user',
                 ]
             );
 
             Auth::login($user);
 
             $token = $user->createToken('auth_token')->plainTextToken;
-            return redirect()->away('http://localhost:8080/dashboard?token=' . $token . '&user=' . urlencode($user->name));
+
+            return redirect()->away(
+                'http://localhost:8080/dashboard?token=' . $token .
+                '&user=' . urlencode($user->name) .
+                '&role=' . $user->role
+            );
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Falha ao autenticar com Google: ' . $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Falha ao autenticar com Google: ' . $e->getMessage()
+            ], 500);
         }
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AgendarCorte;
 use App\Services\DashboardService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,5 +27,22 @@ class DashboardController extends Controller
         return response()->json(
             $this->dashboardService->getEstatisticas($userId, $ano, $perPage, $page)
         );
+    }
+
+    public function todosAgendamentos(): JsonResponse
+    {
+        $agendamentos = AgendarCorte::with(['usuario', 'servico'])
+            ->orderByDesc('data_agendamento')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'usuario' => $item->usuario->name ?? 'Desconhecido',
+                    'data_agendamento' => $item->data_agendamento,
+                    'hora_agendamento' => $item->hora_agendamento,
+                    'servico' => $item->servico->servico ?? 'N/A'
+                ];
+            });
+
+        return response()->json($agendamentos);
     }
 }
