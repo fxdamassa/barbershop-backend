@@ -40,3 +40,16 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 // Dashboard geral
 Route::middleware('auth:sanctum')->get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas']);
 Route::middleware('auth:sanctum')->get('/dashboard/estatisticas/{ano?}', [DashboardController::class, 'estatisticas']);
+
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/admin/servicos', [\App\Http\Controllers\ServicosController::class, 'index']);
+    Route::post('/admin/servicos', [\App\Http\Controllers\ServicosController::class, 'store']);
+    Route::put('/admin/servicos/{id}', [\App\Http\Controllers\ServicosController::class, 'update']);
+    Route::delete('/admin/servicos/{id}', [\App\Http\Controllers\ServicosController::class, 'destroy']);
+
+    Route::get('/admin/agendamentos', [\App\Http\Controllers\AgendamentosAdminController::class, 'index']);
+    Route::post('/admin/agendamentos', [\App\Http\Controllers\AgendamentosAdminController::class, 'store']); // opcional: criar manualmente
+    Route::delete('/admin/agendamentos/{id}', [\App\Http\Controllers\AgendamentosAdminController::class, 'cancelar']);
+
+    Route::get('/admin/usuarios', [\App\Http\Controllers\UsuariosAdminController::class, 'index']);
+});
