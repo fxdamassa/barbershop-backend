@@ -22,4 +22,10 @@ class UsuariosAdminController extends Controller
             ->paginate($perPage, ['id', 'name', 'email', 'role']);
         return response()->json($users);
     }
+
+    public function options()
+    {
+        return response()->json(\App\Models\User::orderBy('name')->get(['id','name']));
+    }
+
 }

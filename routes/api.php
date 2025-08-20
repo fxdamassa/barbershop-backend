@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AgendamentosAdminController;
+use App\Http\Controllers\ServicosController;
+use App\Http\Controllers\UsuariosAdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GoogleController;
@@ -35,21 +38,28 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'estatisticas']);
     Route::get('/admin/agendamentos', [DashboardController::class, 'todosAgendamentos']);
+
+    Route::get('/admin/agendamentos/export/xlsx', [AgendamentosAdminController::class, 'exportXlsx']);
+    Route::get('/admin/agendamentos/export/pdf',  [AgendamentosAdminController::class, 'exportPdf']);
+
+
+    Route::get('/admin/servicos/options', [ServicosController::class, 'options']);
+    Route::get('/admin/usuarios/options', [UsuariosAdminController::class, 'options']);
 });;
 
 // Dashboard geral
 Route::middleware('auth:sanctum')->get('/dashboard/estatisticas', [DashboardController::class, 'estatisticas']);
 Route::middleware('auth:sanctum')->get('/dashboard/estatisticas/{ano?}', [DashboardController::class, 'estatisticas']);
 
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/admin/servicos', [\App\Http\Controllers\ServicosController::class, 'index']);
-    Route::post('/admin/servicos', [\App\Http\Controllers\ServicosController::class, 'store']);
-    Route::put('/admin/servicos/{id}', [\App\Http\Controllers\ServicosController::class, 'update']);
-    Route::delete('/admin/servicos/{id}', [\App\Http\Controllers\ServicosController::class, 'destroy']);
+Route::middleware(['auth:sanctum', 'admin'])->group(callback: function () {
+    Route::get('/admin/servicos', [ServicosController::class, 'index']);
+    Route::post('/admin/servicos', [ServicosController::class, 'store']);
+    Route::put('/admin/servicos/{id}', [ServicosController::class, 'update']);
+    Route::delete('/admin/servicos/{id}', [ServicosController::class, 'destroy']);
 
-    Route::get('/admin/agendamentos', [\App\Http\Controllers\AgendamentosAdminController::class, 'index']);
-    Route::post('/admin/agendamentos', [\App\Http\Controllers\AgendamentosAdminController::class, 'store']); // opcional: criar manualmente
-    Route::delete('/admin/agendamentos/{id}', [\App\Http\Controllers\AgendamentosAdminController::class, 'cancelar']);
+    Route::get('/admin/agendamentos', [AgendamentosAdminController::class, 'index']);
+    Route::post('/admin/agendamentos', [AgendamentosAdminController::class, 'store']);
+    Route::delete('/admin/agendamentos/{id}', [AgendamentosAdminController::class, 'cancelar']);
 
-    Route::get('/admin/usuarios', [\App\Http\Controllers\UsuariosAdminController::class, 'index']);
+    Route::get('/admin/usuarios', [UsuariosAdminController::class, 'index']);
 });

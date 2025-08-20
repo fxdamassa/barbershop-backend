@@ -52,5 +52,10 @@ class ServicosController extends Controller
         $servico->delete();
         return response()->json(['message' => 'Serviço excluído']);
     }
+
+    public function options()
+    {
+        return response()->json(\App\Models\Servico::orderBy('servico')->get(['id','servico']));
+    }
 }
 
